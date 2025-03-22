@@ -48,7 +48,6 @@ export async function reOrderImage(req: Request, res: Response) {
       throw new ApiException('Order must be a number', 400);
     }
 
-    // Get the current image and its order
     const currentImage = await prisma.image.findUnique({
       where: { id },
       select: { order: true },
@@ -172,7 +171,10 @@ export async function DeleteImage(req: Request, res: Response) {
       },
     });
 
-    fs.unlinkSync(path.join(__dirname, '../../public/', deletedImage.url));
+    if (fs.existsSync(path.join(__dirname, '../../public/', deletedImage.url))) {
+      fs.unlinkSync(path.join(__dirname, '../../public/', deletedImage.url));
+    }
+    
     return res.status(200).json({ success: true, message: 'Image deleted' });
   } catch (error) {
     if (error instanceof ApiException) {
