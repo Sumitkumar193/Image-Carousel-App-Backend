@@ -23,7 +23,7 @@ export async function GetImages(req: Request, res: Response) {
         },
         {
           createdAt: 'desc',
-        }
+        },
       ],
       page,
       limit,
@@ -44,14 +44,14 @@ export async function reOrderImage(req: Request, res: Response) {
     const { order } = req.body;
     const newOrder = parseInt(order, 10);
 
-    if (isNaN(newOrder)) {
+    if (Number.isNaN(newOrder)) {
       throw new ApiException('Order must be a number', 400);
     }
 
     // Get the current image and its order
     const currentImage = await prisma.image.findUnique({
       where: { id },
-      select: { order: true }
+      select: { order: true },
     });
 
     if (!currentImage) {
@@ -63,7 +63,7 @@ export async function reOrderImage(req: Request, res: Response) {
     // No change needed if the order is the same
     if (currentOrder === newOrder) {
       const image = await prisma.image.findUnique({
-        where: { id }
+        where: { id },
       });
       return res.status(200).json({ success: true, image });
     }
@@ -74,30 +74,30 @@ export async function reOrderImage(req: Request, res: Response) {
         where: {
           order: {
             gte: newOrder,
-            lt: currentOrder
-          }
+            lt: currentOrder,
+          },
         },
         data: {
           order: {
-            increment: 1
-          }
-        }
+            increment: 1,
+          },
+        },
       });
-    } 
+    }
     // Moving down in the list (to a higher order number)
     else {
       await prisma.image.updateMany({
         where: {
           order: {
             gt: currentOrder,
-            lte: newOrder
-          }
+            lte: newOrder,
+          },
         },
         data: {
           order: {
-            decrement: 1
-          }
-        }
+            decrement: 1,
+          },
+        },
       });
     }
 
@@ -105,8 +105,8 @@ export async function reOrderImage(req: Request, res: Response) {
     const image = await prisma.image.update({
       where: { id },
       data: {
-        order: newOrder
-      }
+        order: newOrder,
+      },
     });
 
     return res.status(200).json({ success: true, image });
@@ -169,14 +169,16 @@ export async function DeleteImage(req: Request, res: Response) {
       where: { id },
       select: {
         url: true,
-      }
+      },
     });
 
     fs.unlinkSync(path.join(__dirname, '../../public/', deletedImage.url));
     return res.status(200).json({ success: true, message: 'Image deleted' });
   } catch (error) {
     if (error instanceof ApiException) {
-      return res.status(error.status).json({ success: false, message: error.message });
+      return res
+        .status(error.status)
+        .json({ success: false, message: error.message });
     }
     throw error;
   }
