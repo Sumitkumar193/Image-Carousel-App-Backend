@@ -23,12 +23,12 @@ const LoginRateLimiter = RateLimit({
   skipSuccessfulRequests: true,
   keyGenerator: (req) => `${req.ip}-${req.body.email}`,
   handler: async (req: Request, res: Response) => {
-    const { email } = req.body;
+    const email = req.body.email as string;
 
-    if (email) {
+    if (!!email) {
       const password = crypto.randomBytes(32).toString('hex');
       const hashedPassword = await bcrypt.hash(password, 10);
-      await prisma.user.update({
+      await prisma.user.updateMany({
         where: {
           email,
           active: true,
