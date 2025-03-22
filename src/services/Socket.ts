@@ -32,6 +32,10 @@ class Socket {
   private static userSocketIdMap: Map<string, Set<string>> = new Map();
 
   static init(server: IServer) {
+    if (this.io) {
+      return this.io;
+    }
+
     this.io = new Server(server, {
       cors: {
         origin: (origin, callback) => {
@@ -87,6 +91,8 @@ class Socket {
       await handleAuth();
       console.log('Socket connected', socket.id);
     });
+
+    console.log('Socket server initialized');
   }
 
   /**
