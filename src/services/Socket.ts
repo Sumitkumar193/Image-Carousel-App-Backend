@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import AppException from '../errors/AppException';
 import TokenService from './TokenService';
 import prisma from '../database/Prisma';
+import validateOrigin from './CorsValidateOrigin';
 
 /**
  * @class Socket
@@ -34,7 +35,7 @@ class Socket {
     this.io = new Server(server, {
       cors: {
         origin: (origin, callback) => {
-          if (process.env.ALLOWED_ORIGINS?.split(',').includes(origin ?? '')) {
+          if (!origin || validateOrigin(origin)) {
             callback(null, true);
           } else {
             callback(new Error('Not allowed by CORS'));

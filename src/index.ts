@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import logger from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import validateOrigin from './services/CorsValidateOrigin';
 import RedisClient from './cache/Redis';
 import MailService from './services/MailService';
 import Socket from './services/Socket';
@@ -19,7 +20,13 @@ MailService.init();
 const app = express();
 
 const corsOptions: CorsOptions = {
-  origin: process.env.ALLOWED_ORIGINS || '*',
+  origin: (origin, callback) => {
+    if (!origin || validateOrigin(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-TOKEN'],
   credentials: true,
