@@ -40,7 +40,7 @@ app.use(express.json());
 
 const limit = RateLimit({
   windowMs: 60 * 1000,
-  limit: 15,
+  limit: parseInt(process.env.RATELIMIT ?? '100', 10),
   message: 'Too many requests from this IP, please try again after a minute',
 });
 
