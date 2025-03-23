@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'node:path';
 import prisma from '../database/Prisma';
 import ApiException from '../errors/ApiException';
+import Socket from '../services/Socket';
 
 export async function GetImages(req: Request, res: Response) {
   try {
@@ -108,6 +109,7 @@ export async function reOrderImage(req: Request, res: Response) {
       },
     });
 
+    Socket.emit('image:reorder', image);
     return res.status(200).json({ success: true, image });
   } catch (error) {
     if (error instanceof ApiException) {
@@ -143,6 +145,7 @@ export async function createImage(req: Request, res: Response) {
       },
     });
 
+    Socket.emit('image:create', image);
     return res.status(200).json({ success: true, image });
   } catch (error) {
     if (error instanceof ApiException) {
@@ -175,6 +178,7 @@ export async function DeleteImage(req: Request, res: Response) {
       fs.unlinkSync(path.join(__dirname, '../../public/', deletedImage.url));
     }
     
+    Socket.emit('image:delete', deletedImage);
     return res.status(200).json({ success: true, message: 'Image deleted' });
   } catch (error) {
     if (error instanceof ApiException) {
