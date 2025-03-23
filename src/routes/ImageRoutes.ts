@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
+import fs from 'fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {
@@ -12,7 +13,11 @@ import Paginate from '../middlewares/Pagination';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../public/uploads'));
+    const savePath = path.join(__dirname, '../../public/uploads');
+    if (!fs.existsSync(savePath)) {
+      fs.mkdirSync(savePath, { recursive: true });
+    }
+    cb(null, savePath);
   },
   filename: (req, file, cb) => {
     cb(null, crypto.randomBytes(16).toString('hex') + path.extname(file.originalname));
