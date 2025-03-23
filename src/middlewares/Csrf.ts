@@ -26,9 +26,10 @@ export function AttachCsrf(req: Request, res: Response): void {
       maxAge: 60 * 15 * 1000,
     });
     res.setHeader('X-CSRF-TOKEN', csrfToken);
+    res.status(200).json({ success: true, message: 'CSRF token attached', token: csrfToken });
+  } else {
+    res.status(405).json({ success: false, message: 'Method not allowed' });
   }
-
-  res.status(200).json({ success: true, message: 'CSRF token attached' });
 }
 
 export function VerifyCsrf(
