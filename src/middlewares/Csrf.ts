@@ -25,6 +25,7 @@ export function AttachCsrf(req: Request, res: Response): void {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 15 * 1000,
     });
+    res.setHeader('X-CSRF-TOKEN', csrfToken);
   }
 
   res.status(200).json({ success: true, message: 'CSRF token attached' });
