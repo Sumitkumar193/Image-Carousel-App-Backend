@@ -11,7 +11,8 @@ const { generateToken, doubleCsrfProtection } = doubleCsrf({
     httpOnly: true,
     sameSite: process.env.COOKIE_SAME_SITE as SameSiteType ?? 'none',
     secure: process.env.NODE_ENV === 'production',
-    expires: new Date(Date.now() + 60 * 15 * 1000),
+    maxAge: parseInt(process.env.COOKIE_TTL ?? '86400', 10) * 1000,
+    expires: new Date(Date.now() + parseInt(process.env.COOKIE_TTL ?? '86400', 10) * 1000),
   },
   size: 64,
 });
@@ -23,7 +24,7 @@ export function AttachCsrf(req: Request, res: Response): void {
       httpOnly: false,
       sameSite: process.env.COOKIE_SAME_SITE as SameSiteType ?? 'none',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 15 * 1000,
+      maxAge: parseInt(process.env.COOKIE_TTL ?? '86400', 10) * 1000,
     });
     res.status(200).json({ success: true, message: 'CSRF token attached', token: csrfToken });
   } else {
