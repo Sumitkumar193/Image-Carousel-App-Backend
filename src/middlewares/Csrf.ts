@@ -9,7 +9,7 @@ const { generateToken, doubleCsrfProtection } = doubleCsrf({
   cookieName: 'x-csrf-token',
   cookieOptions: {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     secure: process.env.NODE_ENV === 'production',
     expires: new Date(Date.now() + 60 * 15 * 1000),
   },
@@ -21,11 +21,10 @@ export function AttachCsrf(req: Request, res: Response): void {
     const csrfToken = generateToken(req, res);
     res.cookie('XSRF-TOKEN', csrfToken, {
       httpOnly: false, // Client reads this cookie
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 15 * 1000,
     });
-    res.setHeader('X-CSRF-TOKEN', csrfToken);
     res.status(200).json({ success: true, message: 'CSRF token attached', token: csrfToken });
   } else {
     res.status(405).json({ success: false, message: 'Method not allowed' });
