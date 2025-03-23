@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { doubleCsrf } from 'csrf-csrf';
+import { doubleCsrf, SameSiteType } from 'csrf-csrf';
 import ApiException from '../errors/ApiException';
 
 const { generateToken, doubleCsrfProtection } = doubleCsrf({
@@ -9,7 +9,7 @@ const { generateToken, doubleCsrfProtection } = doubleCsrf({
   cookieName: 'x-csrf-token',
   cookieOptions: {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: process.env.COOKIE_SAME_SITE as SameSiteType ?? 'none',
     secure: process.env.NODE_ENV === 'production',
     expires: new Date(Date.now() + 60 * 15 * 1000),
   },
@@ -20,8 +20,8 @@ export function AttachCsrf(req: Request, res: Response): void {
   if (req.method === 'GET') {
     const csrfToken = generateToken(req, res);
     res.cookie('XSRF-TOKEN', csrfToken, {
-      httpOnly: false, // Client reads this cookie
-      sameSite: 'none',
+      httpOnly: false,
+      sameSite: process.env.COOKIE_SAME_SITE as SameSiteType ?? 'none',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 15 * 1000,
     });
