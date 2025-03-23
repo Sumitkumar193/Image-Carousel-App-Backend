@@ -6,6 +6,7 @@ export default function validateOrigin(origin: string) {
       const pattern = allowed.replace('*', '.*');
       return new RegExp(pattern).test(origin);
     }
+    console.log(allowed, origin, allowed === origin, 'allowed === origin');
     return allowed === origin;
   });
 }
